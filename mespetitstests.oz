@@ -1,6 +1,6 @@
 
 
-declare X Y To NewSpaceShip NoBomb NewList Next CreateNewListNTimes Next R MoveSnackForward 
+declare X Y To NewSpaceShip NoBomb NewList Next CreateNewListNTimes Next R MoveSnackForward DecodeStrategyAux
 fun {MoveSnackForward ListX ListY ListTo Positions Last}
    case ListTo of nil then Positions
    [] To|TT then
@@ -39,7 +39,6 @@ fun {MoveSnackForward ListX ListY ListTo Positions Last}
       end
    end
 end 
-declare
 fun {SnackTurn ListX ListY ListTo Positions Set Direction}
    case ListTo of nil then nil
    [] To|TT then
@@ -104,15 +103,8 @@ fun {ParseSpaceShipDirection SpaceShipPos R}
    [] H|T then {ParseSpaceShipDirection T {Append R [H.to]}}
    end
 end
-declare
  
 
-{Browse {Next spaceship(team:red name:gordon
-positions: [pos(x:6 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
-effects: nil
-strategy: [forward forward]
-seismicCharge: NoBomb
-) turn(left)}}
 
 
 
@@ -120,34 +112,12 @@ seismicCharge: NoBomb
 
 
 
-fun {Next Spaceship Instruction}
-   % Spaceship is a record
-   % La manière la plus évdidente est de faire des case
-   % On commence les cases pour l'instruction et on va parse les records du spaceship    
-   % Il faut créer un nouveau spaceship I guess
-   % On commence par les case pattern sur l'instruction
-   X = {ParseSpaceShipPositionX Spaceship.positions nil}
-   Y = {ParseSpaceShipPositionY Spaceship.positions nil}
-   To = {ParseSpaceShipDirection Spaceship.positions nil}
-   case Instruction of nil then {Browse nil}
-   [] turn(left) then 
-      {AdjoinList Spaceship [positions#{SnackTurn X Y To nil 0 left}] NewSpaceShip}
 
-   [] turn(right) then  
-      {AdjoinList Spaceship  [positions#{SnackTurn X Y To nil 0 right}] NewSpaceShip }
-
-   [] forward then 
-      {AdjoinList Spaceship [positions#{MoveSnackForward X Y To nil nil}] NewSpaceShip}
-   end
-      % Faut faire gaffe à la direction, c'est tout
-   NewSpaceShip
-end
 fun {DecodeStrategy Strategy}
    case Strategy of nil then nil
    [] H|T then {DecodeStrategyAux Strategy R}
    end
 end
-declare
 fun {DecodeStrategyAux Strategy R}
    case Strategy of nil then R
    [] H|T then
@@ -170,5 +140,41 @@ fun {DecodeStrategyAux Strategy R}
    end
 
 end
-{Browse {DecodeStrategyAux [forward forward turn(right) turn(right)] nil}}
-{Browse {DecodeStrategy [forward forward turn(right) turn(right)]}}
+fun {Next Spaceship Instruction}
+   % Spaceship is a record
+   % La manière la plus évdidente est de faire des case
+   % On commence les cases pour l'instruction et on va parse les records du spaceship    
+   % Il faut créer un nouveau spaceship I guess
+   % On commence par les case pattern sur l'instruction
+   local NewSpaceShip in
+      {Browse {MoveSnackForward {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil}}
+      case Instruction of nil then {Browse nil}
+      [] turn(left) then {AdjoinList Spaceship [positions#{SnackTurn {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil 0 left}] NewSpaceShip}
+
+      [] turn(right) then {AdjoinList Spaceship [positions#{SnackTurn {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil 0 right}] NewSpaceShip}
+
+      [] forward then {AdjoinList Spaceship [positions#[{MoveSnackForward {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil}]] NewSpaceShip}
+      end
+      % Faut faire gaffe à la direction, c'est tout
+      NewSpaceShip
+   end
+end
+
+
+{Browse {Next spaceship(team:red name:gordon
+positions: [pos(x:6 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
+effects: nil
+strategy: [forward forward]
+seismicCharge: NoBomb
+) turn(left)}}
+
+
+
+
+{AdjoinList spaceship(team:red name:gordon
+positions: [pos(x:6 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
+effects: nil
+strategy: [forward forward]
+seismicCharge: NoBomb
+)  [positions#[pos(x:7 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]] Test}
+{Browse Test}

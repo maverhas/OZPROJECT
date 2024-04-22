@@ -34,15 +34,11 @@ in
    local
       % Déclarez vos functions ici
       % Declare your functions here
-      X
-      Y
-      To
       SnackTurn
       MoveSnackForward
       ParseSpaceShipDirection
       ParseSpaceShipPositionY
       ParseSpaceShipPositionX
-      NewSpaceShip
       CreateNewListNTimes
       NewList
       DecodeStrategyAux
@@ -203,18 +199,21 @@ in
          % On commence les cases pour l'instruction et on va parse les records du spaceship    
          % Il faut créer un nouveau spaceship I guess
          % On commence par les case pattern sur l'instruction
-         case Instruction of nil then {Browse nil}
-         [] turn(left) then 
-            {AdjoinList Spaceship [positions#{SnackTurn {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil 0 left}] NewSpaceShip}
-      
-         [] turn(right) then  
-            {AdjoinList Spaceship  [positions#{SnackTurn {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil 0 right}] NewSpaceShip }
-      
-         [] forward then 
-            {AdjoinList Spaceship [positions#{MoveSnackForward {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil}] NewSpaceShip}
+         local NewSpaceShip in
+            case Instruction of nil then {Browse nil}
+            [] turn(left) then 
+               {AdjoinList Spaceship [positions#{SnackTurn {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil 0 left}] NewSpaceShip}
+         
+            [] turn(right) then  
+               {AdjoinList Spaceship  [positions#{SnackTurn {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil 0 right}] NewSpaceShip }
+         
+            [] forward then 
+               {AdjoinList Spaceship [positions#{MoveSnackForward {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil}] NewSpaceShip}
+            end
+            NewSpaceShip
          end
             % Faut faire gaffe à la direction, c'est tout
-         NewSpaceShip
+         
       end
 
       
@@ -247,7 +246,7 @@ in
 		   debug: true
 		   % Instants par seconde, 0 spécifie une exécution pas à pas. (appuyer sur 'Espace' fait avancer le jeu d'un pas)
 		   % Steps per second, 0 for step by step. (press 'Space' to go one step further)
-		   frameRate: 5
+		   frameRate: 0
 		)
    end
 
