@@ -44,11 +44,8 @@ in
       ParseSpaceShipPositionX
       NewSpaceShip
       CreateNewListNTimes
-      F
       NewList
       DecodeStrategyAux
-      Name
-      RVALUE
    in
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
       % en compte des effets qui l'affectent et de son instruction
