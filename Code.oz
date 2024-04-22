@@ -71,7 +71,7 @@ in
          if Count =< 0 then Lst else {CreateNewListNTimes {Append Lst Lst} Count-1} end
       end
       fun {DecodeStrategyAux Strategy R}
-         case Strategy of nil then nil
+         case Strategy of nil then R
          [] H|T then
             case {Label H} of turn then
                case H of turn(right) then
@@ -203,18 +203,15 @@ in
          % On commence les cases pour l'instruction et on va parse les records du spaceship    
          % Il faut créer un nouveau spaceship I guess
          % On commence par les case pattern sur l'instruction
-         X = {ParseSpaceShipPositionX Spaceship.positions nil}
-         Y = {ParseSpaceShipPositionY Spaceship.positions nil}
-         To = {ParseSpaceShipDirection Spaceship.positions nil}
          case Instruction of nil then {Browse nil}
          [] turn(left) then 
-            {AdjoinList Spaceship [positions#{SnackTurn X Y To nil 0 left}] NewSpaceShip}
+            {AdjoinList Spaceship [positions#{SnackTurn {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil 0 left}] NewSpaceShip}
       
          [] turn(right) then  
-            {AdjoinList Spaceship  [positions#{SnackTurn X Y To nil 0 right}] NewSpaceShip }
+            {AdjoinList Spaceship  [positions#{SnackTurn {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil 0 right}] NewSpaceShip }
       
          [] forward then 
-            {AdjoinList Spaceship [positions#{MoveSnackForward X Y To nil nil}] NewSpaceShip}
+            {AdjoinList Spaceship [positions#{MoveSnackForward {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil}] NewSpaceShip}
          end
             % Faut faire gaffe à la direction, c'est tout
          NewSpaceShip

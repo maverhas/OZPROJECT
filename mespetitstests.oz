@@ -1,6 +1,6 @@
 
 
-declare X Y To NewSpaceShip NoBomb
+declare X Y To NewSpaceShip NoBomb NewList Next CreateNewListNTimes Next R MoveSnackForward 
 fun {MoveSnackForward ListX ListY ListTo Positions Last}
    case ListTo of nil then Positions
    [] To|TT then
@@ -105,7 +105,22 @@ fun {ParseSpaceShipDirection SpaceShipPos R}
    end
 end
 declare
- fun {Next Spaceship Instruction}
+ 
+
+{Browse {Next spaceship(team:red name:gordon
+positions: [pos(x:6 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
+effects: nil
+strategy: [forward forward]
+seismicCharge: NoBomb
+) turn(left)}}
+
+
+
+
+
+
+
+fun {Next Spaceship Instruction}
    % Spaceship is a record
    % La manière la plus évdidente est de faire des case
    % On commence les cases pour l'instruction et on va parse les records du spaceship    
@@ -127,11 +142,33 @@ declare
       % Faut faire gaffe à la direction, c'est tout
    NewSpaceShip
 end
+fun {DecodeStrategy Strategy}
+   case Strategy of nil then nil
+   [] H|T then {DecodeStrategyAux Strategy R}
+   end
+end
+declare
+fun {DecodeStrategyAux Strategy R}
+   case Strategy of nil then R
+   [] H|T then
+      case {Label H} of turn then
+         case H of turn(right) then
+            {DecodeStrategyAux T {Append R [fun {$ Spaceship} {Next Spaceship H} end]}}
+         [] turn(left) then
+            {DecodeStrategyAux T {Append R [fun {$ Spaceship} {Next Spaceship H} end]}}
+         end
+      [] repeat then
+         case H.1 of nil then nil
+         [] F|S then
+            NewList = {CreateNewListNTimes H.1 H.times}
+            {DecodeStrategyAux NewList|T R}
+         end
+      [] forward then 
+           {DecodeStrategyAux T {Append R [fun {$ Spaceship} {Next Spaceship H} end]}}
+         
+      end
+   end
 
-{Browse {Next spaceship(team:red name:gordon
-positions: [pos(x:6 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
-effects: nil
-strategy: [forward forward]
-seismicCharge: NoBomb
-) turn(left)}}
-
+end
+{Browse {DecodeStrategyAux [forward forward turn(right) turn(right)] nil}}
+{Browse {DecodeStrategy [forward forward turn(right) turn(right)]}}
