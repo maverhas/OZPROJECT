@@ -5,10 +5,10 @@ in
 	    walls:true
 	    step: 0
 	    spaceships: [
-		     spaceship(team:red name:gordon
-			   positions: [pos(x:6 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
+		     spaceship(team:blue name:gordon
+			   positions: [pos(x:24 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
 			   effects: nil
-			   strategy: [forward forward forward forward forward forward turn(right) turn(right)]
+			   strategy: [forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward turn(right) turn(right)]
 			   seismicCharge: NoBomb
 			  )
 		     spaceship(team:green name:steve
