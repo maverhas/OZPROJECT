@@ -8,7 +8,7 @@ in
 		     spaceship(team:blue name:gordon
 			   positions: [pos(x:6 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
 			   effects: nil
-			   strategy: [forward forward repeat([turn(left)] times:20)]
+			   strategy: [forward forward repeat([forward] times:20)]
 			   seismicCharge: NoBomb
 			  )
 		    %  spaceship(team:green name:steve

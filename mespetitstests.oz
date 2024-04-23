@@ -182,3 +182,58 @@ seismicCharge: NoBomb
 declare 
 Space = space([salut])
 {Browse Space.1}
+
+{Browse {Length [1 2 3]}}
+declare
+Listss = [1 2 3]
+{Browse Listss.2}
+declare
+Direction = direction(left)
+if Direction == direction(left) then {Browse 1} end
+declare Move
+fun {Move ListX ListY ListTo Positions Last Set Direction}
+   case ListX of nil then Positions
+   [] X|TX then
+      case ListY of nil then nil
+         case ListTo of nil then nil
+            case Set of 0 then
+               if Direction == forward then
+                  case ListTo.1 of east then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X+1 y:ListY.1 to:ListTo.1)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] west then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X-1 y:ListY.1 to:ListTo.1)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] north then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X y:ListY.1-1 to:ListTo.1)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] south then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X y:ListY.1+1 to:ListTo.1)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  end
+               end
+               if Direction == turn(left) then
+                  case ListTo.1 of east then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X y:ListY.1-1 to:north)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] west then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X y:ListY.1+1 to:south)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] south then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X+1 y:ListY.1 to:east)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] north then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X-1 y:ListY.1 to:west)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  end
+               end
+               if Direction == turn(right) then
+                  case ListTo.1 of east then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X y:ListY.1+1 to:north)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] west then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X y:ListY.1-1 to:south)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] south then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X-1 y:ListY.1 to:east)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  [] north then
+                     {Move TX ListY.2 ListTo.2 {Append Positions [pos(x:X+1 y:ListY.1 to:west)]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+                  end
+               end
+            [] 1 then
+               {Move TX ListY.2 ListTo.2 {Append Positions [Last]} pos(x:X y:ListY.1 to:ListTo.1) 1 nil}
+            end
+   end
+end
+
+{Browse {Move [1 2] [2 3] [east west] nil nil 0 turn(right)}}
