@@ -65,7 +65,7 @@ in
 
 
 
-      fun {Move ListX ListY ListTo Positions Last Set Direction}
+      fun {Move ListX ListY ListTo Positions Last Set Direction Spaceship}
          case ListX of nil then Positions
          [] X|TX then
             case ListY of nil then Positions
@@ -73,40 +73,84 @@ in
                case ListTo of nil then Positions
                []To|TT then
                   case Set of 0 then
-                     case Direction of forward then
-                        case To of east then
-                           {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil}
-                        [] west then
-                           {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil}
-                        [] north then
-                           {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:To)]} pos(x:X y:Y to:To) 1 nil}
-                        [] south then
-                           {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:To)]} pos(x:X y:Y to:To) 1 nil}
+                     case Spaceship.effects of nil then
+                        case Direction of forward then
+                           case To of east then
+                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] west then
+                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] north then
+                              {Browse hahahaha}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] south then
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                           end
+                        
+                        [] turn(left) then
+                           case To of east then
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] west then
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] south then
+                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] north then
+                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                           end
+                        [] turn(right) then
+                           case To of east then
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] west then
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] south then
+                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                           [] north then
+                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                           end
                         end
-                     
-                     [] turn(left) then
-                        case To of east then
-                           {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} pos(x:X y:Y to:To) 1 nil}
-                        [] west then
-                           {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} pos(x:X y:Y to:To) 1 nil}
-                        [] south then
-                           {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil}
-                        [] north then
-                           {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil}
-                        end
-                     [] turn(right) then
-                        case To of east then
-                           {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:north)]} pos(x:X y:Y to:To) 1 nil}
-                        [] west then
-                           {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:south)]} pos(x:X y:Y to:To) 1 nil}
-                        [] south then
-                           {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil}
-                        [] north then
-                           {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil}
+                     []H|T then
+                        case {Label H} of wormhole then
+                           local NewX NewY in 
+                              NewX = H.x
+                              NewY = H.y
+                              {Browse Spaceship.effects}
+                              {Browse salut}
+                              case Direction of forward then
+                                 case To of east then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] west then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] north then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] south then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 end
+                              
+                              [] turn(left) then
+                                 case To of east then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] west then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] south then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] north then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 end
+                              [] turn(right) then
+                                 case To of east then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] west then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] south then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 [] north then
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                                 end
+                              end
+                           end
                         end
                      end
                   [] 1 then
-                     {Move TX TY TT {Append Positions [Last]} pos(x:X y:Y to:To) 1 nil}
+                     {Move TX TY TT {Append Positions [Last]} pos(x:X y:Y to:To) 1 nil nil}
                   end
                end
             end
@@ -367,23 +411,30 @@ in
                %          end
                %       end
                %    end
-                  end
-               end
-            end
-         end
-      end
+      %             end
+      %          end
+      %       end
+      %    end
+      % end
                      
 
       fun {Next Spaceship Instruction}
+         {Browse Spaceship.effects}
          % Spaceship is a record
          % La manière la plus évdidente est de faire des case
          % On commence les cases pour l'instruction et on va parse les records du spaceship    
          % Il faut créer un nouveau spaceship I guess
          % On commence par les case pattern sur l'instruction
-         local NewSpaceShip in
-            {Browse {Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction}}
-            {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction}] NewSpaceShip}
-            NewSpaceShip
+         local NewSpaceShip FinalSpaceship in
+            case Spaceship.effects of nil then 
+               {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] FinalSpaceship}
+            []H|T then
+               case {Label H} of wormhole then
+                  {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] NewSpaceShip}
+                  {AdjoinList NewSpaceShip [effects#{List.drop Spaceship.effects 1}] FinalSpaceship}
+               end
+            end
+            FinalSpaceship
          end
             % Faut faire gaffe à la direction, c'est tout
          
@@ -410,7 +461,7 @@ in
       Options = options(
 		   % Fichier contenant le scénario (depuis Dossier)
 		   % Path of the scenario (relative to Dossier)
-		   scenario:'scenario/scenario_test_moves.oz'
+		   scenario:'scenario/scenario_test_teleport.oz'
 		   % Utilisez cette touche pour quitter la fenêtre
 		   % Use this key to leave the graphical mode
 		   closeKey:'Escape'

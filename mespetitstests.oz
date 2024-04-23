@@ -237,3 +237,7 @@ fun {Move ListX ListY ListTo Positions Last Set Direction}
 end
 
 {Browse {Move [1 2] [2 3] [east west] nil nil 0 turn(right)}}
+
+declare
+Listed = [1 2 3]
+{Browse {List.drop Listed 1}}
