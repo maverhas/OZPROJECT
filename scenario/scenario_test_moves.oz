@@ -6,9 +6,9 @@ in
 	    step: 0
 	    spaceships: [
 		     spaceship(team:blue name:gordon
-			   positions: [pos(x:24 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
+			   positions: [pos(x:6 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]
 			   effects: nil
-			   strategy: [forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward turn(right) turn(right)]
+			   strategy: [forward turn(left) forward forward turn(right) turn(left) turn(left) forward turn(right) forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward forward turn(right) turn(right)]
 			   seismicCharge: NoBomb
 			  )
 		     spaceship(team:green name:steve
