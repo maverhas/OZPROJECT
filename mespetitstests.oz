@@ -178,3 +178,7 @@ strategy: [forward forward]
 seismicCharge: NoBomb
 )  [positions#[pos(x:7 y:6 to:east) pos(x:5 y:6 to:east) pos(x:4 y:6 to:east) pos(x:3 y:6 to:east)]] Test}
 {Browse Test}
+
+declare 
+Space = space([salut])
+{Browse Space.1}

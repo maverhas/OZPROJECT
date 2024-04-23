@@ -64,12 +64,14 @@ in
       % Auxiliary function for DecodeStrategy
 
       
-      fun {CreateNewListNTimes Lst Count}
-         if Count =< 0 then Lst else {CreateNewListNTimes {Append Lst Lst} Count-1} end
+      fun {CreateNewListNTimes Lst Count R}
+         if Count =< 0 then R else {CreateNewListNTimes Lst Count-1 {Append R Lst}} end
       end
       fun {DecodeStrategyAux Strategy R}
+         
          case Strategy of nil then R
          [] H|T then
+            {Browse {Label H}}
             case {Label H} of turn then
                case H of turn(right) then
                   {DecodeStrategyAux T {Append R [fun {$ Spaceship} {Next Spaceship H} end]}}
@@ -79,8 +81,7 @@ in
             [] repeat then
                case H.1 of nil then nil
                [] F|S then
-                  NewList = {CreateNewListNTimes H.1 H.times}
-                  {DecodeStrategyAux NewList|T R}
+                  {DecodeStrategyAux {Append {CreateNewListNTimes H.1 H.times nil} T} R}
                end
             [] forward then 
                  {DecodeStrategyAux T {Append R [fun {$ Spaceship} {Next Spaceship H} end]}}
