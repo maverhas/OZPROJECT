@@ -250,3 +250,25 @@ fun {Revert Listed R}
    end
 end
 {Browse {Revert [1 2 3 4 5 6] nil}}
+
+
+
+
+declare Res
+fun {Scrap Positions R Last}
+   case Positions of nil then
+      case Last.to of east then
+         {Append R [pos(x:Last.x-1 y:Last.y to:east)]}
+      [] north then
+         {Append R [pos(x:Last.x y:Last.y+1 to:east)]}
+      [] south then
+         {Append R [pos(x:Last.x-1 y:Last.y-1 to:east)]}
+      [] west then
+         {Append R [pos(x:Last.x+1 y:Last.y to:east)]}
+      end
+   [] H|T then 
+      {Scrap T {Append R [H]} H}
+   end
+end
+Res = {Scrap [pos(x:1 y:2 to:west) pos(x:2 y:2 to:west) pos(x:3 y:2 to:west) pos(x:4 y:2 to:west)] nil nil}
+{Browse Res}

@@ -74,7 +74,8 @@ in
             [] west then
                {Append R [pos(x:Last.x+1 y:Last.y to:east)]}
             end
-         []H|T then {Scrap T {Append R H} H}
+         [] H|T then 
+            {Scrap T {Append R [H]} H}
          end
       end
 
@@ -92,8 +93,6 @@ in
             end
          end
       end
-
-
 
       fun {Move ListX ListY ListTo Positions Last Set Direction Spaceship}
          {Browse 1}
@@ -190,7 +189,7 @@ in
                            local FirstTemp SecondTemp in 
                               {AdjoinList Spaceship [positions#{Scrap Spaceship.positions nil nil}] FirstTemp}
                               {AdjoinList FirstTemp [effects#{List.drop FirstTemp.effects 1}] SecondTemp}
-                              {Move {ParseSpaceShipPositionX SecondTemp.positions nil} {ParseSpaceShipPositionY SecondTemp.positions nil} {ParseSpaceShipDirection SecondTemp.positions nil} nil nil 0 Direction FirstTemp}
+                              {Move {ParseSpaceShipPositionX SecondTemp.positions nil} {ParseSpaceShipPositionY SecondTemp.positions nil} {ParseSpaceShipDirection SecondTemp.positions nil} nil nil 0 Direction SecondTemp}
                            end
                         end
                      end
@@ -274,7 +273,9 @@ in
                   %On clear l'effet dans le spaceship de retour
                   {AdjoinList NewSpaceShip [effects#{List.drop NewSpaceShip.effects 1}] FinalSpaceship}
                [] scrap then
-                  {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] FinalSpaceship}
+                  {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] NewSpaceShip}
+                  {AdjoinList NewSpaceShip [effects#{List.drop NewSpaceShip.effects 1}] FinalSpaceship}
+
                end
             end
             FinalSpaceship
@@ -304,7 +305,7 @@ in
       Options = options(
 		   % Fichier contenant le scénario (depuis Dossier)
 		   % Path of the scenario (relative to Dossier)
-		   scenario:'scenario/scenario_test_grow.oz'
+		   scenario:'scenario/scenario_crazy.oz'
 		   % Utilisez cette touche pour quitter la fenêtre
 		   % Use this key to leave the graphical mode
 		   closeKey:'Escape'
