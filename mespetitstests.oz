@@ -241,3 +241,12 @@ end
 declare
 Listed = [1 2 3]
 {Browse {List.drop Listed 1}}
+
+declare
+fun {Revert Listed R}
+   case Listed of nil then R
+   []H|T then
+      {Revert T H|R}
+   end
+end
+{Browse {Revert [1 2 3 4 5 6] nil}}

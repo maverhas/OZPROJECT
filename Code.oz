@@ -34,14 +34,14 @@ in
    local
       % Déclarez vos functions ici
       % Declare your functions here
-      SnackTurn
-      MoveSnackForward
       ParseSpaceShipDirection
       ParseSpaceShipPositionY
       ParseSpaceShipPositionX
       CreateNewListNTimes
       DecodeStrategyAux
       Move
+      Revert
+      Scrap
    in
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
       % en compte des effets qui l'affectent et de son instruction
@@ -63,9 +63,40 @@ in
 
 
 
+      fun {Scrap Positions R Last}
+         case Positions of nil then
+            case Last.to of east then
+               {Append R [pos(x:Last.x-1 y:Last.y to:east)]}
+            [] north then
+               {Append R [pos(x:Last.x y:Last.y+1 to:east)]}
+            [] south then
+               {Append R [pos(x:Last.x-1 y:Last.y-1 to:east)]}
+            [] west then
+               {Append R [pos(x:Last.x+1 y:Last.y to:east)]}
+            end
+         []H|T then {Scrap T {Append R H} H}
+         end
+      end
+
+      fun {Revert Positions R}
+         case Positions of nil then R
+         [] H|T then 
+            case H.to of east then
+               {Revert T pos(x:H.x y:H.y to:west)|R}
+            [] west then
+               {Revert T pos(x:H.x y:H.y to:east)|R}
+            [] north then
+               {Revert T pos(x:H.x y:H.y to:south)|R}
+            [] south then
+               {Revert T pos(x:H.x y:H.y to:north)|R}
+            end
+         end
+      end
+
 
 
       fun {Move ListX ListY ListTo Positions Last Set Direction Spaceship}
+         {Browse 1}
          case ListX of nil then Positions
          [] X|TX then
             case ListY of nil then Positions
@@ -78,9 +109,9 @@ in
                            case To of east then
                               {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil nil}
                            [] west then
+                              {Browse salut}
                               {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil nil}
                            [] north then
-                              {Browse hahahaha}
                               {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
                            [] south then
                               {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
@@ -97,14 +128,15 @@ in
                               {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil nil}
                            end
                         [] turn(right) then
+                           {Browse Spaceship.positions}
                            case To of east then
-                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} pos(x:X y:Y to:To) 1 nil nil}
                            [] west then
-                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} pos(x:X y:Y to:To) 1 nil nil}
                            [] south then
-                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil nil}
                            [] north then
-                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil nil}
                            end
                         end
                      []H|T then
@@ -137,15 +169,28 @@ in
                                  end
                               [] turn(right) then
                                  case To of east then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:south)]} pos(x:X y:Y to:To) 1 nil nil}
                                  [] west then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:north)]} pos(x:X y:Y to:To) 1 nil nil}
                                  [] south then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:west)]} pos(x:X y:Y to:To) 1 nil nil}
                                  [] north then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:east)]} pos(x:X y:Y to:To) 1 nil nil}
                                  end
                               end
+                           end
+                        [] revert then
+                           local FirstTemp SecondTemp in
+                              %On reverse et clear l'effet dans le spaceship temporaire
+                              {AdjoinList Spaceship [positions#{Revert Spaceship.positions nil}] FirstTemp}
+                              {AdjoinList FirstTemp [effects#{List.drop FirstTemp.effects 1}] SecondTemp}
+                              {Move {ParseSpaceShipPositionX SecondTemp.positions nil} {ParseSpaceShipPositionY SecondTemp.positions nil} {ParseSpaceShipDirection SecondTemp.positions nil} nil nil 0 Direction SecondTemp}
+                           end
+                        [] scrap then
+                           local FirstTemp SecondTemp in 
+                              {AdjoinList Spaceship [positions#{Scrap Spaceship.positions nil nil}] FirstTemp}
+                              {AdjoinList FirstTemp [effects#{List.drop FirstTemp.effects 1}] SecondTemp}
+                              {Move {ParseSpaceShipPositionX SecondTemp.positions nil} {ParseSpaceShipPositionY SecondTemp.positions nil} {ParseSpaceShipDirection SecondTemp.positions nil} nil nil 0 Direction FirstTemp}
                            end
                         end
                      end
@@ -205,220 +250,10 @@ in
          [] H|T then {ParseSpaceShipDirection T {Append R [H.to]}}
          end
       end
-
-      % fun {MoveSnackForward ListX ListY ListTo Positions Last}
-      %    % case Effects of nil then
-      %       case ListTo of nil then Positions
-      %       [] To|TT then
-      %          case ListX of nil then nil
-      %          [] X|TX then
-      %             case ListY of nil then nil
-      %             [] Y|TY then
-      %                case Last of nil then
-      %                   case To of east then 
-      %                      if X+1 > 23 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:2 y:Y to:east)]} east} 
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} To} 
-      %                      end
-      %                   [] west then 
-      %                      if X-1 < 2 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:23 y:Y to:west)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} To}
-      %                      end
-      %                   [] south then 
-      %                      if Y + 1 > 23 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:2 to:south)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} To}
-      %                      end
-      %                   [] north then 
-      %                      if Y - 1 < 2 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:23 to:north)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} To}
-      %                      end
-      %                   end
-      %                [] west then 
-      %                   case To of west then
-      %                      if X-1 < 2 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:23 y:Y to:west)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} To}
-      %                      end
-      %                   [] north then 
-      %                      if X - 1 < 2 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:23 y:Y to:west)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X - 1 y:Y to:west)]} To}
-      %                      end
-      %                   [] south then  
-      %                      if X - 1 < 2 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:23 y:Y to:west)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X - 1 y:Y to:west)]} To}
-      %                      end
-      %                   end
-      %                [] east then 
-      %                   case To of east then 
-      %                      if X + 1 > 23 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:2 y:Y to:east)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} To}
-      %                      end
-      %                   [] north then 
-      %                      if X + 1 > 23 then 
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:2 y:Y to:east)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} To}
-      %                      end
-      %                   [] south then 
-      %                      if X + 1 > 23 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:2 y:y to:east)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} To}
-      %                      end
-      %                   end
-      %                [] south then 
-      %                   case To of south then 
-      %                      if Y + 1 > 23 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:2 to:south)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} To}
-      %                      end 
-      %                   [] east then 
-      %                      if Y + 1 > 23 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:2 to:south)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} To}
-      %                      end 
-      %                   [] west then
-      %                      if Y + 1 > 23 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:2 to:south)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} To}
-      %                      end
-      %                   end
-      %                [] north then 
-      %                   case To of north then 
-      %                      if Y - 1 < 2 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:23 to:north)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} To}
-      %                      end 
-      %                   [] east then 
-      %                      if Y - 1 < 2 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:2 to:north)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} To}
-      %                      end 
-      %                   [] west then 
-      %                      if Y - 1 < 2 then
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:23 to:north)]} To}
-      %                      else
-      %                         {MoveSnackForward TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} To}
-      %                      end 
-      %                   end
-      %                end 
-      %             end
-      %          end
-      %       end
-      % end 
-
-
-
-
-
-
-      
-      % fun {SnackTurn ListX ListY ListTo Positions Set Direction Last}
-      %    case ListTo of nil then nil
-      %    [] To|TT then
-      %       case ListX of nil then nil
-      %       [] X|TX then 
-      %          case ListY of nil then nil
-      %          [] Y|TY then
-      %            case Set of 1 then {MoveSnackForward ListX ListY ListTo Positions Last}
-      %            [] 0 then 
-      %                case Direction of nil then nil
-      %                [] left then
-      %                    case To of east then
-      %                      if Y -1 < 2 then
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X y:23 to:north)]} Set+1 left To}
-      %                      else
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} Set+1 left To}
-      %                      end
-      %                    [] west then 
-      %                      if Y + 1 > 23 then
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X y:2 to:south)]} Set+1 left To}
-      %                      else 
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} Set+1 left To}
-      %                      end
-      %                    [] north then 
-      %                      if X - 1 < 2 then
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:23 y:Y to:west)]} Set+1 left To}
-      %                      else
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} Set+1 left To}
-      %                      end
-      %                    [] south then 
-      %                      if X + 1 > 23 then
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:2 y:Y to:east)]} Set+1 left To}
-      %                      else
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} Set+1 left To}
-      %                      end
-      %                    end
-      %                [] right then
-      %                   case To of east then 
-      %                      if Y + 1 > 23 then
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X y:2 to:south)]} Set+1 right To}
-      %                      else
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} Set+1 right To}
-      %                      end
-      %                   [] west then 
-      %                      if Y - 1 < 2 then
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X y:23 to:north)]} Set+1 right To}
-      %                      else
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} Set+1 right To}
-      %                      end
-      %                   [] north then 
-      %                      if X + 1 > 23 then
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:2 y:Y to:east)]} Set+1 right To}
-      %                      else
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} Set+1 right To}
-      %                      end
-      %                   [] south then 
-      %                      if X - 1 < 2 then
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:23 y:Y to:west)]} Set+1 right To}
-      %                      else
-      %                         {SnackTurn TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} Set+1 right To}
-      %                      end
-      %                   end
-      %               end
-               %   [] 1 then 
-               %       case Direction of nil then nil
-               %       [] right then
-               %          case To of east then {SnackTurn TX TY TT {Append Positions [pos(x:X+1 y:Y to:south)]} Set+1 nil}
-               %          [] west then {SnackTurn TX TY TT {Append Positions [pos(x:X-1 y:Y to:north)]} Set+1 nil}
-               %          [] north then {SnackTurn TX TY TT {Append Positions [pos(x:X y:Y-1 to:east)]} Set+1 nil}
-               %          [] south then {SnackTurn TX TY TT {Append Positions [pos(x:X y:Y+1 to:west)]} Set+1 nil}
-               %          end
-               %       [] left then
-               %          case To of east then {SnackTurn TX TY TT {Append Positions [pos(x:X+1 y:Y to:north)]} Set+1 nil}
-               %          [] west then {SnackTurn TX TY TT {Append Positions [pos(x:X-1 y:Y to:south)]} Set+1 nil}
-               %          [] north then {SnackTurn TX TY TT {Append Positions [pos(x:X y:Y-1 to:west)]} Set+1 nil}
-               %          [] south then {SnackTurn TX TY TT {Append Positions [pos(x:X y:Y+1 to:east)]} Set+1 nil}
-               %          end
-               %       end
-               %    end
-      %             end
-      %          end
-      %       end
-      %    end
-      % end
                      
 
       fun {Next Spaceship Instruction}
+         {Browse Spaceship.positions}
          {Browse Spaceship.effects}
          % Spaceship is a record
          % La manière la plus évdidente est de faire des case
@@ -428,10 +263,18 @@ in
          local NewSpaceShip FinalSpaceship in
             case Spaceship.effects of nil then 
                {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] FinalSpaceship}
+               {Browse FinalSpaceship.effects}
             []H|T then
                case {Label H} of wormhole then
                   {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] NewSpaceShip}
                   {AdjoinList NewSpaceShip [effects#{List.drop Spaceship.effects 1}] FinalSpaceship}
+               [] revert then
+                  {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] NewSpaceShip}
+                  {Browse NewSpaceShip.effects}
+                  %On clear l'effet dans le spaceship de retour
+                  {AdjoinList NewSpaceShip [effects#{List.drop NewSpaceShip.effects 1}] FinalSpaceship}
+               [] scrap then
+                  {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] FinalSpaceship}
                end
             end
             FinalSpaceship
@@ -461,7 +304,7 @@ in
       Options = options(
 		   % Fichier contenant le scénario (depuis Dossier)
 		   % Path of the scenario (relative to Dossier)
-		   scenario:'scenario/scenario_test_teleport.oz'
+		   scenario:'scenario/scenario_test_grow.oz'
 		   % Utilisez cette touche pour quitter la fenêtre
 		   % Use this key to leave the graphical mode
 		   closeKey:'Escape'
