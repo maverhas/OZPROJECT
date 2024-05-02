@@ -499,8 +499,8 @@ proc {ShowSpaceships Spaceships}
                {C tk(create rectangle Cell.x*20-4 Cell.y*20-4 Cell.x*20+4 Cell.y*20+4 tags:@R fill:Spaceship.team)}
 
                % Wings (symmetric on both sides)
-               {C tk(create rectangle Cell.x*20-12 Cell.y*20-2 Cell.x*20-6 Cell.y*20+2 tags:@R fill:'silver')} % Left wing
-               {C tk(create rectangle Cell.x*20+6 Cell.y*20-2 Cell.x*20+12 Cell.y*20+2 tags:@R fill:'silver')} % Right wing
+               {C tk(create rectangle Cell.x*20-12 Cell.y*20-2 Cell.x*20-6 Cell.y*20+2 tags:@R fill:'red')} % Left wing
+               {C tk(create rectangle Cell.x*20+6 Cell.y*20-2 Cell.x*20+12 Cell.y*20+2 tags:@R fill:'red')} % Right wing
 
                % Thrusters (bottom, but symmetrically designed so orientation doesn't matter)
                {C tk(create rectangle Cell.x*20-2 Cell.y*20+4 
@@ -517,8 +517,8 @@ proc {ShowSpaceships Spaceships}
                {C tk(create rectangle Cell.x*20-4 Cell.y*20-4 Cell.x*20+4 Cell.y*20+4 tags:@R fill:Spaceship.team)}
 
                % Wings (symmetric on both sides)
-               {C tk(create rectangle Cell.x*20-12 Cell.y*20-2 Cell.x*20-6  Cell.y*20+2 tags:@R fill:'silver')} % Left wing
-               {C tk(create rectangle Cell.x*20+6  Cell.y*20-2 Cell.x*20+12 Cell.y*20+2 tags:@R fill:'silver')} % Right wing
+               {C tk(create rectangle Cell.x*20-12 Cell.y*20-2 Cell.x*20-6  Cell.y*20+2 tags:@R fill:'red')} % Left wing
+               {C tk(create rectangle Cell.x*20+6  Cell.y*20-2 Cell.x*20+12 Cell.y*20+2 tags:@R fill:'red')} % Right wing
 
                % Thrusters (bottom, but symmetrically designed so orientation doesn't matter)
                {C tk(create rectangle Cell.x*20-2 Cell.y*20-8 
@@ -543,8 +543,8 @@ proc {ShowSpaceships Spaceships}
                                       tags:@R fill:if IsAlive then red else black end)} % Lower thruster
 
                % Wings adjusted for horizontal (eastward) orientation
-               {C tk(create rectangle Cell.x*20 Cell.y*20-6 Cell.x*20+4 Cell.y*20-10 tags:@R fill:'silver')} % Upper wing, repositioned for eastward flight
-               {C tk(create rectangle Cell.x*20 Cell.y*20+6 Cell.x*20+4 Cell.y*20+10 tags:@R fill:'silver')} % Lower wing, repositioned for eastward flight
+               {C tk(create rectangle Cell.x*20 Cell.y*20-6 Cell.x*20+4 Cell.y*20-10 tags:@R fill:'red')} % Upper wing, repositioned for eastward flight
+               {C tk(create rectangle Cell.x*20 Cell.y*20+6 Cell.x*20+4 Cell.y*20+10 tags:@R fill:'red')} % Lower wing, repositioned for eastward flight
 
                % Cockpit (central and circular, making it look the same from all sides)
                {C tk(create oval Cell.x*20-2 Cell.y*20-2 Cell.x*20+2 Cell.y*20+2 tags:@R fill:'blue')}
@@ -561,8 +561,8 @@ proc {ShowSpaceships Spaceships}
                                       tags:@R fill:if IsAlive then red else black end)} % Lower thruster
 
                % Wings adjusted for horizontal (westward) orientation
-               {C tk(create rectangle Cell.x*20-4 Cell.y*20-10 Cell.x*20 Cell.y*20-6 tags:@R fill:'silver')} % Upper wing, repositioned for westward flight
-               {C tk(create rectangle Cell.x*20-4 Cell.y*20+10 Cell.x*20 Cell.y*20+6 tags:@R fill:'silver')} % Lower wing, repositioned for westward flight
+               {C tk(create rectangle Cell.x*20-4 Cell.y*20-10 Cell.x*20 Cell.y*20-6 tags:@R fill:'red')} % Upper wing, repositioned for westward flight
+               {C tk(create rectangle Cell.x*20-4 Cell.y*20+10 Cell.x*20 Cell.y*20+6 tags:@R fill:'red')} % Lower wing, repositioned for westward flight
 
                % Cockpit (central and circular, making it look the same from all sides)
                {C tk(create oval Cell.x*20-2 Cell.y*20-2 Cell.x*20+2 Cell.y*20+2 tags:@R fill:'blue')}
