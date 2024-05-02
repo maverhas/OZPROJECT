@@ -42,7 +42,6 @@ in
       Move
       Revert
       Scrap
-      Bomb
       Destroy
    in
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
@@ -64,11 +63,13 @@ in
       % Auxiliary function under
 
 
-      fun {Bomb Spaceship DropLst}
-         {AdjoinAt Spaceship seismicCharge {List.append DropLst Spaceship.seismicCharge}}
-     end
+   %    fun {Bomb Spaceship DropLst}
+   %       {AdjoinAt Spaceship seismicCharge {List.append DropLst Spaceship.seismicCharge}}
+   %   end
 
      fun {Destroy Positions R}
+      % Fonction appliquant le pouvoir suivant
+      % -> Destruction de la queue des vaisseaux adverses (ne peut se produire que si la taille du vaisseau >= 2)
       {Browse Positions}
       case Positions of H|T then
          if T == nil then
@@ -80,6 +81,8 @@ in
      end
 
       fun {Scrap Positions R Last}
+         %Fonction permettant d'appliquer le pouvoir suivant
+         % -> Ajout d'un wagon à la fin du vaisseau qui arrive sur la case contenant le pouvoir
          case Positions of nil then
             case Last.to of east then
                {Append R [pos(x:Last.x-1 y:Last.y to:east)]}
@@ -96,6 +99,8 @@ in
       end
 
       fun {Revert Positions R}
+         % Fonction appliquant le pouvoir suivant
+         % -> Inverse la tête et la queue du vaisseau, en inversant également la direction de la tête
          case Positions of nil then R
          [] H|T then 
             case H.to of east then
@@ -111,25 +116,38 @@ in
       end
 
       fun {Move ListX ListY ListTo Positions Last Set Direction Spaceship Effects UpdatedEffect}
-         {Browse 1}
-         case ListX of nil then 
+         % Fonctionnement général de la fonction : Nous regardons si des effets sont présents; si oui, nous les appliquons.
+         % Autrement, nous appliquons l'instruction Direction à la tête, et à chaque itération i, le wagon i prend l'ancienne position du wagon i-1
+
+         % ListX : Coordonnées X des positions de chaque wagon du vaisseau, créé grâce à ParseSpaceshipX
+         % ListY : Coordonnées Y des positions de chaque wagon du vaisseau, créé grâce à ParseSpaceshipY
+         % ListTo : Liste des orientations de chaque wagon du vaisseau, créé grâce à ParseSpaceshipDirection
+         % Positions : Paramètre stockant après chaque itération i de la fonction move, la nouvelle position du wagon i du vaisseau
+         % Last : Paramètre permettant de stocker la position du wagon précédemment visité, afin de bouger à l'itération i le wagon i à l'ancienne position du wagon i-1
+         % Set : Un flag qui permet de déterminer si on travaille sur la tête du vaisseau ou sur les wagons
+         % Direction : La direction donnée pour ce tour (forward, turn(left) ou turn(right))
+         % Spaceship : Le Spaceship sur lequel nous travaillons
+         % Effects : La liste d'effets associée au Spaceship
+         % UpdatedEffect : Paramètre permettant de stocker la liste des effets du vaisseau actualisée après application des pouvoirs 
+         % Fonction qui gère les déplacements du vaisseau
+         case ListX of nil then % Si la liste des positions est vide alors on a fait bouger chaque partie du vaisseau et appliqué tous les effets,
+                                % on update la position du vaisseau ainsi que ses effets et on retourne le nouveau vaisseau
             local FirstTemp SecondTemp in
                {AdjoinList Spaceship [positions#Positions] FirstTemp}
                {AdjoinList FirstTemp [effects#UpdatedEffect] SecondTemp}
                SecondTemp
-            end %peut être ici ? return le spaceship vu qu'on aura update les effets au fur et à mesure
+            end 
          [] X|TX then
             case ListY of nil then 1
             [] Y|TY then
                case ListTo of nil then  1
                []To|TT then
-                  case Set of 0 then
-                     case Effects of nil then
+                  case Set of 0 then % On travaill sur la tête
+                     case Effects of nil then % Cas dans lequel tous les effets ont été appliqués, on applique juste l'instruction
                         case Direction of forward then
                            case To of east then
                               {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] west then
-                              {Browse salut}
                               {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] north then
                               {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
@@ -159,13 +177,12 @@ in
                               {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            end
                         end
-                     []H|T then
+                     []H|T then % Il y'a des effets à appliquer, on les applique puis on commence à se charger des instructions
+                                % Dans chaque case on s'occupe d'un effet, puis on relance move avec l'effets suivant s'il existe, sinon on fait comme ci-dessus
                         case {Label H} of wormhole then
                            local NewX NewY in 
                               NewX = H.x
                               NewY = H.y
-                              {Browse Spaceship.effects}
-                              {Browse salut}
                               case Direction of forward then
                                  case To of east then
                                     {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect} 
@@ -260,9 +277,12 @@ in
       
       
       fun {CreateNewListNTimes Lst Count R}
+         % Fonction pour créer une liste qui est n fois la list Lst copiée
          if Count =< 0 then R else {CreateNewListNTimes Lst Count-1 {Append R Lst}} end
       end
-      fun {DecodeStrategyAux Strategy R}
+      fun {DecodeStrategyAux Strategy R} 
+         % Fonction auxiliaire à décode strategy
+         % Retourne dans R une liste de fonctions appelant Next, avec l'instruction voulue
          case Strategy of nil then R
          [] H|T then
             case {Label H} of turn then
@@ -283,7 +303,8 @@ in
          end
      
       end
-      %  3 fonctions de parsing
+
+      %  3 fonctions de parsing qui retournent des listes des cooronnées x, y des positions de chaque wagon ainsi que leur orientation
 
       fun {ParseSpaceShipPositionX SpaceShipPos R}
          % Fonction qui parse spaceship et retourne une liste des coordonnées X
@@ -305,8 +326,7 @@ in
       end
                      
 
-      fun {Next Spaceship Instruction}
-         {Browse Spaceship.effects}
+      fun {Next Spaceship Instruction} % Fonction Next qui retourne le nouveau SpaceShip, qui fait appelle à la fonction Move et le SpaceShip qu'elle retourne
          local NewSpaceShip in
             NewSpaceShip = {Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship Spaceship.effects nil}
             NewSpaceShip
@@ -325,7 +345,7 @@ in
       % strategy ::= <instruction> '|' <strategy>
       %            | repeat(<strategy> times:<integer>) '|' <strategy>
       %            | nil
-      fun {DecodeStrategy Strategy}
+      fun {DecodeStrategy Strategy} % Appelle la fonction auxiliaire de DecodeStrategy
          case Strategy of nil then nil
          [] H|T then {DecodeStrategyAux Strategy nil}
          end
@@ -335,7 +355,7 @@ in
       Options = options(
 		   % Fichier contenant le scénario (depuis Dossier)
 		   % Path of the scenario (relative to Dossier)
-		   scenario:'scenario/Scenario.oz'
+		   scenario:'scenario/scenario_crazy.oz'
 		   % Utilisez cette touche pour quitter la fenêtre
 		   % Use this key to leave the graphical mode
 		   closeKey:'Escape'
