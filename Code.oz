@@ -42,6 +42,7 @@ in
       Move
       Revert
       Scrap
+      Bomb
    in
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
       % en compte des effets qui l'affectent et de son instruction
@@ -61,6 +62,10 @@ in
       %            )
       % Auxiliary function under
 
+
+      fun {Bomb Spaceship DropLst}
+         {AdjoinAt Spaceship seismicCharge {List.append DropLst Spaceship.seismicCharge}}
+     end
 
 
       fun {Scrap Positions R Last}
@@ -94,48 +99,53 @@ in
          end
       end
 
-      fun {Move ListX ListY ListTo Positions Last Set Direction Spaceship}
+      fun {Move ListX ListY ListTo Positions Last Set Direction Spaceship Effects UpdatedEffect}
          {Browse 1}
-         case ListX of nil then Positions
+         case ListX of nil then 
+            local FirstTemp SecondTemp in
+               {AdjoinList Spaceship [positions#Positions] FirstTemp}
+               {AdjoinList FirstTemp [effects#UpdatedEffect] SecondTemp}
+               SecondTemp
+            end %peut être ici ? return le spaceship vu qu'on aura update les effets au fur et à mesure
          [] X|TX then
-            case ListY of nil then Positions
+            case ListY of nil then {Browse erreur}
             [] Y|TY then
-               case ListTo of nil then Positions
+               case ListTo of nil then  {Browse erreur}
                []To|TT then
                   case Set of 0 then
-                     case Spaceship.effects of nil then
+                     case Effects of nil then
                         case Direction of forward then
                            case To of east then
-                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] west then
                               {Browse salut}
-                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] north then
-                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] south then
-                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            end
                         
                         [] turn(left) then
                            case To of east then
-                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] west then
-                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] south then
-                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] north then
-                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            end
                         [] turn(right) then
                            {Browse Spaceship.positions}
                            case To of east then
-                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y+1 to:south)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] west then
-                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X y:Y-1 to:north)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] south then
-                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X-1 y:Y to:west)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            [] north then
-                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                              {Move TX TY TT {Append Positions [pos(x:X+1 y:Y to:east)]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                            end
                         end
                      []H|T then
@@ -147,54 +157,77 @@ in
                               {Browse salut}
                               case Direction of forward then
                                  case To of east then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect} 
                                  [] west then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  [] north then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  [] south then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:To)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:To)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  end
                               
                               [] turn(left) then
                                  case To of east then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:north)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  [] west then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:south)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  [] south then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:east)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  [] north then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:west)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  end
                               [] turn(right) then
                                  case To of east then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:south)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX+1 y:NewY to:south)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  [] west then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:north)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX-1 y:NewY to:north)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  [] south then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:west)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY+1 to:west)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  [] north then
-                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:east)]} pos(x:X y:Y to:To) 1 nil nil}
+                                    {Move TX TY TT {Append Positions [pos(x:NewX y:NewY-1 to:east)]} pos(x:X y:Y to:To) 1 nil Spaceship T UpdatedEffect}
                                  end
                               end
                            end
                         [] revert then
-                           local FirstTemp SecondTemp in
+                           local FirstTemp in
                               %On reverse et clear l'effet dans le spaceship temporaire
                               {AdjoinList Spaceship [positions#{Revert Spaceship.positions nil}] FirstTemp}
-                              {AdjoinList FirstTemp [effects#{List.drop FirstTemp.effects 1}] SecondTemp}
-                              {Move {ParseSpaceShipPositionX SecondTemp.positions nil} {ParseSpaceShipPositionY SecondTemp.positions nil} {ParseSpaceShipDirection SecondTemp.positions nil} nil nil 0 Direction SecondTemp}
+                              % {AdjoinList FirstTemp [effects#{List.drop FirstTemp.effects 1}] SecondTemp}
+                              {Move {ParseSpaceShipPositionX FirstTemp.positions nil} {ParseSpaceShipPositionY FirstTemp.positions nil} {ParseSpaceShipDirection FirstTemp.positions nil} nil nil 0 Direction FirstTemp T UpdatedEffect}
                            end
                         [] scrap then
-                           local FirstTemp SecondTemp in 
+                           local FirstTemp in 
                               {AdjoinList Spaceship [positions#{Scrap Spaceship.positions nil nil}] FirstTemp}
-                              {AdjoinList FirstTemp [effects#{List.drop FirstTemp.effects 1}] SecondTemp}
-                              {Move {ParseSpaceShipPositionX SecondTemp.positions nil} {ParseSpaceShipPositionY SecondTemp.positions nil} {ParseSpaceShipDirection SecondTemp.positions nil} nil nil 0 Direction SecondTemp}
+                              % {AdjoinList FirstTemp [effects#{List.drop FirstTemp.effects 1}] SecondTemp}
+                              {Move {ParseSpaceShipPositionX FirstTemp.positions nil} {ParseSpaceShipPositionY FirstTemp.positions nil} {ParseSpaceShipDirection FirstTemp.positions nil} nil nil 0 Direction FirstTemp T UpdatedEffect}
+                           end
+                        [] malware then
+                           % ca viendra ici
+                           % {AdjoinList Spaceship [effects#H.] FirstTemp}
+                           local NewMalware S in
+                              if H.n > 0 then
+                                 NewMalware = malware(n:H.n-1)
+                                 case Direction of turn(left) then
+                                    {Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 turn(right) Spaceship T {Append UpdatedEffect [NewMalware]}}
+                                 [] turn(right) then
+                                    {Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 turn(left) Spaceship T {Append UpdatedEffect [NewMalware]}}
+                                 [] forward then
+                                    {Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Direction Spaceship T {Append UpdatedEffect [NewMalware]}}
+                                 end
+                              else
+                                 {Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Direction Spaceship T UpdatedEffect}
+                              end
+                           end
+                        [] dropSeismicCharge then
+                           local FirstTemp in 
+                              {Browse H.1}
+                              {AdjoinList Spaceship [seismicCharge#H.1] FirstTemp}
+                              {Move {ParseSpaceShipPositionX FirstTemp.positions nil} {ParseSpaceShipPositionY FirstTemp.positions nil} {ParseSpaceShipDirection FirstTemp.positions nil} nil nil 0 Direction FirstTemp T UpdatedEffect}
                            end
                         end
                      end
                   [] 1 then
-                     {Move TX TY TT {Append Positions [Last]} pos(x:X y:Y to:To) 1 nil nil}
+                     {Move TX TY TT {Append Positions [Last]} pos(x:X y:Y to:To) 1 nil Spaceship Effects UpdatedEffect}
                   end
                end
             end
@@ -252,35 +285,11 @@ in
                      
 
       fun {Next Spaceship Instruction}
-         {Browse Spaceship.positions}
          {Browse Spaceship.effects}
-         % Spaceship is a record
-         % La manière la plus évdidente est de faire des case
-         % On commence les cases pour l'instruction et on va parse les records du spaceship    
-         % Il faut créer un nouveau spaceship I guess
-         % On commence par les case pattern sur l'instruction
-         local NewSpaceShip FinalSpaceship in
-            case Spaceship.effects of nil then 
-               {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] FinalSpaceship}
-               {Browse FinalSpaceship.effects}
-            []H|T then
-               case {Label H} of wormhole then
-                  {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] NewSpaceShip}
-                  {AdjoinList NewSpaceShip [effects#{List.drop Spaceship.effects 1}] FinalSpaceship}
-               [] revert then
-                  {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] NewSpaceShip}
-                  {Browse NewSpaceShip.effects}
-                  %On clear l'effet dans le spaceship de retour
-                  {AdjoinList NewSpaceShip [effects#{List.drop NewSpaceShip.effects 1}] FinalSpaceship}
-               [] scrap then
-                  {AdjoinList Spaceship [positions#{Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship}] NewSpaceShip}
-                  {AdjoinList NewSpaceShip [effects#{List.drop NewSpaceShip.effects 1}] FinalSpaceship}
-
-               end
-            end
-            FinalSpaceship
+         local NewSpaceShip in
+            NewSpaceShip = {Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Instruction Spaceship Spaceship.effects nil}
+            NewSpaceShip
          end
-            % Faut faire gaffe à la direction, c'est tout
          
       end
 
