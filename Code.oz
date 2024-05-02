@@ -43,6 +43,7 @@ in
       Revert
       Scrap
       Bomb
+      Destroy
    in
       % La fonction qui renvoit les nouveaux attributs du serpent après prise
       % en compte des effets qui l'affectent et de son instruction
@@ -67,6 +68,16 @@ in
          {AdjoinAt Spaceship seismicCharge {List.append DropLst Spaceship.seismicCharge}}
      end
 
+     fun {Destroy Positions R}
+      {Browse Positions}
+      case Positions of H|T then
+         if T == nil then
+            R
+         else
+            {Destroy T {Append R [H]}}
+         end
+      end
+     end
 
       fun {Scrap Positions R Last}
          case Positions of nil then
@@ -108,9 +119,9 @@ in
                SecondTemp
             end %peut être ici ? return le spaceship vu qu'on aura update les effets au fur et à mesure
          [] X|TX then
-            case ListY of nil then {Browse erreur}
+            case ListY of nil then 1
             [] Y|TY then
-               case ListTo of nil then  {Browse erreur}
+               case ListTo of nil then  1
                []To|TT then
                   case Set of 0 then
                      case Effects of nil then
@@ -204,7 +215,7 @@ in
                         [] malware then
                            % ca viendra ici
                            % {AdjoinList Spaceship [effects#H.] FirstTemp}
-                           local NewMalware S in
+                           local NewMalware in
                               if H.n > 0 then
                                  NewMalware = malware(n:H.n-1)
                                  case Direction of turn(left) then
@@ -223,6 +234,16 @@ in
                               {Browse H.1}
                               {AdjoinList Spaceship [seismicCharge#H.1] FirstTemp}
                               {Move {ParseSpaceShipPositionX FirstTemp.positions nil} {ParseSpaceShipPositionY FirstTemp.positions nil} {ParseSpaceShipDirection FirstTemp.positions nil} nil nil 0 Direction FirstTemp T UpdatedEffect}
+                           end
+                        [] destroy then % c'est ma copine qui y a pensé (Anaïs (la plus belle de toutes les femmes))
+                           if {Length Spaceship.positions} > 2 then
+                              local FirstTemp in
+                                 {AdjoinList Spaceship [positions#{Destroy Spaceship.positions nil}] FirstTemp}
+                                 {Browse FirstTemp.positions}
+                                 {Move {ParseSpaceShipPositionX FirstTemp.positions nil} {ParseSpaceShipPositionY FirstTemp.positions nil} {ParseSpaceShipDirection FirstTemp.positions nil} nil nil 0 Direction FirstTemp T UpdatedEffect}
+                              end
+                           else
+                              {Move {ParseSpaceShipPositionX Spaceship.positions nil} {ParseSpaceShipPositionY Spaceship.positions nil} {ParseSpaceShipDirection Spaceship.positions nil} nil nil 0 Direction Spaceship T UpdatedEffect}
                            end
                         end
                      end

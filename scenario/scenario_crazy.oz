@@ -29,7 +29,7 @@ in
 			% Scrap and grow
 		    bonus(position:pos(x:12 y:12) color:orange  effect:scrap target:catcher)
 		    bonus(position:pos(x:15 y:12) color:blue  effect:malware(n:10) target:catcher)
-			
+		    bonus(position:pos(x:17 y:12) color:purple  effect:destroy target:catcher)
 			% Drop a seismic charge if the spaceship passes through the bonus
 			bonus(position:pos(x:9 y:9)   color:black   effect:dropSeismicCharge(true|false|true|false|true|NoBomb) target:catcher)
 		    bonus(position:pos(x:18 y:18) color:black   effect:dropSeismicCharge(true|false|true|false|true|NoBomb) target:catcher)
